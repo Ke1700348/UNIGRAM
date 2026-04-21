@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global lock
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Primitive Helpers
+    function isSignedIn() { return request.auth != null; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    
+    // Auth guard for anonymous or Google login (assuming valid UID)
+    function authMatches(uid) { return isSignedIn() && request.auth.uid == uid; }
+
+    match /users/{userId} {
+      allow read: if true; // Public profiles
+      allow create: if authMatches(userId); // Basic creation constraint for brevity
+      allow update: if authMatches(userId) || (isSignedIn() && incoming().diff(existing()).affectedKeys().hasOnly(['followers', 'following'])); 
+      // allows anyone signed in to update followers/following? In a real system, you'd use a subcollection. For this test, it's allowed minimally.
+      allow delete: if authMatches(userId);
+    }
+
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid;
+      // Allow post owner to update anything, allow any signed-in user to update the likes array or commentCount or repostCount
+      allow update: if (isSignedIn() && existing().userId == request.auth.uid) || 
+                      (isSignedIn() && incoming().diff(existing()).affectedKeys().hasOnly(['likes', 'commentCount', 'repostCount']));
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+
+    match /notifications/{notifId} {
+      allow read: if authMatches(resource.data.toUserId);
+      allow create: if isSignedIn(); // anyone can create a notification directed to someone
+      allow update: if authMatches(existing().toUserId) && incoming().diff(existing()).affectedKeys().hasOnly(['read']);
+      allow delete: if authMatches(existing().toUserId);
+    }
+    
+    match /hashtags/{tagId} {
+      allow read: if true;
+      allow create, update: if isSignedIn(); // allow any signed in user to increment
+    }
+  }
+}

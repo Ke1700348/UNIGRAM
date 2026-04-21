@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #080808;
+  --color-surface: #111111;
+  --color-border: #1f1f1f;
+  --color-accent: #ffffff;
+  --color-pop: #ff3cac;
+  --color-pop2: #00f5a0;
+  --color-muted: #555555;
+  --color-reel-bg: #000000;
+  --font-display: "Arial Black", sans-serif;
+  --font-body: "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Space Mono", "Courier New", Courier, monospace;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-accent);
+  font-family: var(--font-body);
+  /* Hide scrollbar for a cleaner look */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Animations */
+@layer utilities {
+  .clip-circle {
+    clip-path: circle(50% at 50% 50%);
+  }
+}
+
+

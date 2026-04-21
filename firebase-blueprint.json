@@ -1,0 +1,105 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the UNIGRAM platform",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "username": { "type": "string" },
+        "displayName": { "type": "string" },
+        "bio": { "type": "string" },
+        "avatarURL": { "type": "string" },
+        "followers": { "type": "array" },
+        "following": { "type": "array" },
+        "vibeTag": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["uid", "username", "displayName"]
+    },
+    "Post": {
+      "title": "Post",
+      "description": "A social feed post or reel",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "username": { "type": "string" },
+        "displayName": { "type": "string" },
+        "avatarURL": { "type": "string" },
+        "text": { "type": "string" },
+        "imageURL": { "type": "string" },
+        "videoURL": { "type": "string" },
+        "type": { "type": "string" },
+        "hashtags": { "type": "array" },
+        "likes": { "type": "array" },
+        "commentCount": { "type": "number" },
+        "repostCount": { "type": "number" },
+        "vibeLabel": { "type": "string" },
+        "createdAt": { "type": "object" }
+      },
+      "required": ["userId", "text", "type"]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "User comment on a post",
+      "type": "object",
+      "properties": {
+        "postId": { "type": "string" },
+        "userId": { "type": "string" },
+        "username": { "type": "string" },
+        "avatarURL": { "type": "string" },
+        "text": { "type": "string" },
+        "likes": { "type": "array" },
+        "createdAt": { "type": "object" }
+      },
+      "required": ["postId", "userId", "text"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Activity alerts for users",
+      "type": "object",
+      "properties": {
+        "toUserId": { "type": "string" },
+        "fromUserId": { "type": "string" },
+        "fromUsername": { "type": "string" },
+        "fromAvatarURL": { "type": "string" },
+        "type": { "type": "string" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "object" }
+      },
+      "required": ["toUserId", "fromUserId", "type"]
+    },
+    "Hashtag": {
+      "title": "Hashtag",
+      "description": "Trending hashtag frequency",
+      "type": "object",
+      "properties": {
+        "count": { "type": "number" },
+        "lastUsed": { "type": "object" }
+      },
+      "required": ["count"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/posts/{postId}": {
+      "schema": { "$ref": "#/entities/Post" },
+      "description": "Posts and Reels"
+    },
+    "/comments/{commentId}": {
+      "schema": { "$ref": "#/entities/Comment" },
+      "description": "Post Comments"
+    },
+    "/notifications/{notifId}": {
+      "schema": { "$ref": "#/entities/Notification" },
+      "description": "User Notifications"
+    },
+    "/hashtags/{tagId}": {
+      "schema": { "$ref": "#/entities/Hashtag" },
+      "description": "Trending Hashtags tracking"
+    }
+  }
+}
